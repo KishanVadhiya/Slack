@@ -8,36 +8,26 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  console.log("Inside login component");
-
   const handleLogin = async (e) => {
-    console.log("Inside handleLogin function");
     e.preventDefault();
     setLoading(true);
     try {
-      console.log("Inside login try block");
-      const data = {username: email, password: password};
-      console.log(data);
+      const data = { username: email, password: password };
       const response = await axios.post(`http://localhost:5000/api/auth/login`, data);
-      console.log("\n\nhello\n\n");
-      console.log(response);
       
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token); // Save token in localStorage
+        setIsAuthenticated(true); // Update the authentication state
         toast.success('Login successful! Redirecting to workspace...');
-        setTimeout(() => navigate('/workspace'), 2000); // Redirect to workspace after 2 seconds
-        // navigate('/workspace');
-        
-        console.log("Login successful");
+        setTimeout(() => navigate('/workspace'), 2000); // Redirect after 2 seconds
       }
     } catch (error) {
-      console.log("Inside login catch block");
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
       toast.error(errorMessage);
     } finally {

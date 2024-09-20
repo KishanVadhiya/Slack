@@ -8,7 +8,7 @@ const ChannelChat = ({ selectedChannel, selectedChannelId }) => {
 
 
   useEffect(() => {
-    console.log("inside useEffect: ", selectedChannelId);
+    // console.log("inside useEffect: ", selectedChannelId);
     const fetchMessages = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -24,7 +24,7 @@ const ChannelChat = ({ selectedChannel, selectedChannelId }) => {
             }
           );
 
-          console.log("responsewfewrewqr: ", response);
+          // console.log("responsewfewrewqr: ", response);
           
           if (response.status === 200) {
             const msg=[];
@@ -46,16 +46,16 @@ const ChannelChat = ({ selectedChannel, selectedChannelId }) => {
 
     fetchMessages();
   },[selectedChannelId]);
-  console.log("Messages: ", messages);
+  // console.log("Messages: ", messages);
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       
-      console.log("selectedChannelId: ", selectedChannelId);
+      // console.log("selectedChannelId: ", selectedChannelId);
       const sendMessage = async () => {
         try {
           const token = localStorage.getItem('token');
           if (token) {
-            console.log("token is present",token);
+            // console.log("token is present",token);
             await axios.post(
               `http://localhost:5000/api/channels/${selectedChannelId}/messages`,
               // 'http://localhost:5000/api/channels/66eba8ff1a04e377bef6989e/messages',
