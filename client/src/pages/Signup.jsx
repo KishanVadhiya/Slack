@@ -23,7 +23,9 @@ const SignUp = () => {
       
       const response = await axios.post('http://localhost:5000/api/auth/signup', {
         username: username,
-        password: password
+        password: password,
+        email: email,
+        name: name
       });
 
       if(response.status === 201) {

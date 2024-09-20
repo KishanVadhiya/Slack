@@ -22,7 +22,7 @@ const Sidebar = () => {
           spacing: 1, 
         }}
       >
-        <Avatar alt="Travis Howard" src="2.jpg" variant="rounded" sx={{width: '40px', height: '40px'}} />
+        <Avatar alt="Travis Howard" src="Slack-logo-vector-11e5bdfc.webp" variant="rounded" sx={{width: '40px', height: '40px'}} />
         <Box 
           sx={{
             flexDirection: 'column', 
