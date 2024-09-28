@@ -8,7 +8,10 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const Login = ({ setIsAuthenticated }) => {
+// Google OAuth
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,10 +25,9 @@ const Login = ({ setIsAuthenticated }) => {
       const response = await axios.post(`http://localhost:5000/api/auth/login`, data);
       
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.token); // Save token in localStorage
-        setIsAuthenticated(true); // Update the authentication state
+        localStorage.setItem('token', response.data.token);
         toast.success('Login successful! Redirecting to workspace...');
-        setTimeout(() => navigate('/workspace'), 2000); // Redirect after 2 seconds
+        setTimeout(() => navigate('/workspace'), 2000);
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
@@ -35,32 +37,46 @@ const Login = ({ setIsAuthenticated }) => {
     }
   };
 
+  const handleGoogleLoginSuccess = async (response) => {
+    const googleToken = response.credential;
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/google', { token: googleToken });
+      if (res.status === 200) {
+        localStorage.setItem('token', res.data.token); // Store JWT token
+        toast.success('Google login successful! Redirecting to workspace...');
+        setTimeout(() => navigate('/workspace'), 2000);
+      }
+    } catch (error) {
+      toast.error('Google login failed.');
+    }
+  };
+
   const handleSignUpClick = () => {
-    navigate('/signup'); // Redirect to signup page
+    navigate('/signup');
   };
 
   return (
     <Stack className='flex'>
-      <Stack 
+      <Stack
         sx={{
           maxWidth: "fit-content",
           marginInline: "auto",
           marginTop: "55px",
           justifyContent: "center",
           alignItems: "center"
-        }} 
+        }}
         gap={1}
       >
         <img src="slack_logo.svg" alt="" className='w-28 cursor-pointer' />
         <h1 className='text-center font-bold text-5xl justify-center w-5/6 mt-5'>Sign in to Slack</h1>
         <p className='font-light mt-4'>We suggest using the <span className='font-medium'>email address that you use at work.</span></p>
 
-        <TextField 
+        <TextField
           id='email'
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder='name@work-email.com'
-          variant="outlined" 
+          variant="outlined"
           sx={{
             width: "90%",
             marginTop: "30px",
@@ -75,12 +91,12 @@ const Login = ({ setIsAuthenticated }) => {
           }}
         />
 
-        <TextField 
+        <TextField
           id='password'
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder='Password'
-          variant="outlined" 
+          variant="outlined"
           type='password'
           sx={{
             width: "90%",
@@ -95,7 +111,7 @@ const Login = ({ setIsAuthenticated }) => {
           }}
         />
 
-        <Button 
+        <Button
           variant="contained"
           onClick={handleLogin}
           disabled={loading}
@@ -113,31 +129,26 @@ const Login = ({ setIsAuthenticated }) => {
           {loading ? 'Logging in...' : 'Login'}
         </Button>
 
-        <Divider 
-          sx={{ 
+        <Divider
+          sx={{
             width: "90%",
-            textAlign: "center", 
+            textAlign: "center",
             marginTop: "5px"
           }}>
-            <p className='font-light opacity-70'>OR</p>
+          <p className='font-light opacity-70'>OR</p>
         </Divider>
 
-        <Button 
-          variant="outlined"
-          sx={{
-            color: "black",
-            width: "90%",
-            borderColor: "#b6b6b7",
-            borderRadius: "12px",
-            height: "45px",
-            borderWidth: "2px"
-          }}
-        >
-          <img src="google.svg" alt="" className='w-4 mr-3' />
-          Continue with Google
-        </Button>
+        <GoogleOAuthProvider clientId="941853391466-s45c0ocd24qcc84smpl0mu459flqds0e.apps.googleusercontent.com">
+          <GoogleLogin
+            onSuccess={handleGoogleLoginSuccess}
+            onError={() => toast.error('Google Login Failed')}
+            width="90%"
+            size="large"
+            ux_mode="popup"
+          />
+        </GoogleOAuthProvider>
 
-        <Button 
+        {/* <Button
           variant="outlined"
           sx={{
             color: "black",
@@ -150,32 +161,10 @@ const Login = ({ setIsAuthenticated }) => {
         >
           <img src="apple.svg" alt="" className='w-4 mb-1 mr-3' />
           Continue with Apple
-        </Button>
+        </Button> */}
 
         <p className='font-light text-sm text-[#616061]'>New to Slack?</p>
         <p className='cursor-pointer text-sm text-[#1264a3]' onClick={handleSignUpClick}>Create an account</p>
-      </Stack>
-      <Stack
-        direction='row'
-        sx={{
-          padding: "10px",
-          textAlign: "center",
-          marginTop: "345px",
-          width: "100%",
-          maxWidth: "fit-content",
-          marginInline: "auto",
-        }}
-        gap={3}
-      >
-        <p className='text-sm text-[#616061] cursor-pointer'>Privacy & terms</p>
-        <p className='text-sm text-[#616061] cursor-pointer'>Contact us</p>
-        <Stack direction='row' className='cursor-pointer'>
-          <img src="world.svg" alt="" className='w-3 opacity-60 mr-1 ' />
-          <p className='text-sm text-[#616061] cursor-pointer'>
-            Change region
-          </p>
-          <img src="down-arrow.svg" alt="" className='w-3 opacity-60 ml-1' />
-        </Stack>
       </Stack>
       <ToastContainer />
     </Stack>
